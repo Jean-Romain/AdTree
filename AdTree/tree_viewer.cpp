@@ -476,13 +476,13 @@ bool TreeViewer::reconstruct_skeleton() {
     }
 
     {   // offer users the option to remove duplicated points
-        int answer = message_box("Robustness hint!",
+        /*int answer = message_box("Robustness hint!",
                                  "The point cloud may has duplicated points. Remove duplication "
                                  "can improve robustness. Would like to do so?",
                                  Type::warning,
                                  Choice::yes_no
-        );
-        if (answer == 1) {
+        );*/
+        if (param_remove_duplication) {
             const float threshold = cloud()->bounding_box().diagonal() * 0.001f;
             const auto &points_to_remove = RemoveDuplication::apply(cloud(), threshold);
             for (auto v : points_to_remove)
@@ -493,9 +493,18 @@ bool TreeViewer::reconstruct_skeleton() {
         }
     }
 
-    if (skeleton_)
-        delete skeleton_;
+    printf("Alpha = %.2f, Subtree = %.2f\n", param_alpha, param_subtree_thresold);
+
+    if (skeleton_) delete skeleton_;
+
     skeleton_ = new Skeleton;
+    skeleton_->set_param_alpha(param_alpha);
+    skeleton_->set_param_subtree_threshold(param_subtree_thresold);
+    skeleton_->set_param_min_radius(param_min_radius);
+
+    if (models_.size() > 1) delete models_[1];
+    if (models_.size() > 2) delete models_[2];
+    models_.resize(1);
 
     SurfaceMesh* mesh = branches();
     if (mesh)

@@ -110,6 +110,10 @@ public:
     };
     std::vector<Branch> get_branches_parameters() const;
 
+	void set_param_alpha(float x) { param_alpha = x; };
+	void set_param_subtree_threshold(float x) { param_subtree_threshold = x; };
+	void set_param_min_radius(float x) { param_min_radius = x; };
+
 private:
 
 	/*-------------------------------------------------------------*/
@@ -139,7 +143,7 @@ private:
 	/*------method for skeleton refining and simplification--------*/
 	/*-------------------------------------------------------------*/
 	//eliminate unimportant small edges and keep the main skeleton
-    void keep_main_skeleton(Graph* i_Graph, double subtree_Threshold);
+    void keep_main_skeleton(Graph* i_Graph);
 
 	//remove similar or collapsed edges in an iteratively fashion
     void merge_collapsed_edges();
@@ -249,6 +253,11 @@ private:
 	double BoundingDistance_;
 
     bool   quiet_;
+
+	/* Added by Jean-Romain Roussel: parameters for simplification */
+	float param_subtree_threshold;
+	float param_alpha;
+	float param_min_radius;
 };
 
 #endif
