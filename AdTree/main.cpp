@@ -93,7 +93,11 @@ void save_skeleton(Skeleton* skeleton, PointCloud* cloud, const std::string& fil
 
 
 // returns the number of processed input files.
-int batch_reconstruct(std::vector<std::string>& point_cloud_files, const std::string& output_folder, bool export_skeleton) {
+int batch_reconstruct(std::vector<std::string>& point_cloud_files, const std::string& output_folder, bool export_skeleton, 
+    float param_alpha, 
+    float param_subtree_thresold, 
+    float param_min_radius) 
+{
     int count(0);
     for (std::size_t i=0; i<point_cloud_files.size(); ++i) {
         const std::string& xyz_file = point_cloud_files[i];
@@ -135,7 +139,12 @@ int batch_reconstruct(std::vector<std::string>& point_cloud_files, const std::st
 
         // --------------------------------------------------------------------------------------------
 
+        printf("Alpha = %.2f, Subtree = %.2f, Min radius = %.2f\n", param_alpha, param_subtree_thresold, param_min_radius);
+
         Skeleton *skeleton = new Skeleton();
+        skeleton->set_param_alpha(param_alpha);
+        skeleton->set_param_subtree_threshold(param_subtree_thresold);
+        skeleton->set_param_min_radius(param_min_radius);
 
         // reconstruct branches
         {
@@ -218,11 +227,36 @@ int main(int argc, char *argv[]) {
         return EXIT_SUCCESS;
     } else if (argc >= 3) {
         bool export_skeleton = false;
-        for (int i = 0; i < argc; ++i) {
+        float param_alpha = 1.0f;
+        float param_subtree_thresold = 0.019f;
+        float param_min_radius = 0.0f;
+        for (int i = 0; i < argc; ++i) 
+        {
             if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "-skeleton") == 0) {
                 export_skeleton = true;
-                break;
             }
+            else if (strcmp(argv[i], "-alpha") == 0) {
+                if (sscanf(argv[i+1], "%f", &param_alpha) != 1) {
+                    std::cerr << "ERROR: -alpha needs 1 arguments: x but " << argv[i] << " is not valid" << std::endl;
+                    return EXIT_FAILURE;
+                }
+                i++;
+            }
+            else if (strcmp(argv[i], "-subtree") == 0) {
+                if (sscanf(argv[i+1], "%f", &param_subtree_thresold) != 1) {
+                    std::cerr << "ERROR: -subtree needs 1 arguments: x but " << argv[i] << " is not valid" << std::endl;
+                    return EXIT_FAILURE;
+                }
+                i++;
+            }
+            else if (strcmp(argv[i], "-radius") == 0) {
+                if (sscanf(argv[i+1], "%f", &param_min_radius) != 1) {
+                    std::cerr << "ERROR: -radius needs 1 arguments: x but " << argv[i] << " is not valid" << std::endl;
+                    return EXIT_FAILURE;
+                }
+                i++;
+            }
+
         }
 
         if (export_skeleton) {
@@ -240,7 +274,7 @@ int main(int argc, char *argv[]) {
             std::string output_dir = second_arg;
             if (file_system::is_file(first_arg)) {
                 std::vector<std::string> cloud_files = {first_arg};
-                return batch_reconstruct(cloud_files, output_dir, export_skeleton) > 0;
+                return batch_reconstruct(cloud_files, output_dir, export_skeleton, param_alpha, param_subtree_thresold, param_min_radius) > 0;
             } else if (file_system::is_directory(first_arg)) {
                 std::vector<std::string> entries;
                 file_system::get_directory_entries(first_arg, entries, false);
@@ -249,7 +283,7 @@ int main(int argc, char *argv[]) {
                     if (file_name.size() > 3 && file_name.substr(file_name.size() - 3) == "xyz")
                         cloud_files.push_back(first_arg + "/" + file_name);
                 }
-                return batch_reconstruct(cloud_files, output_dir, export_skeleton) > 0;
+                return batch_reconstruct(cloud_files, output_dir, export_skeleton, param_alpha, param_subtree_thresold, param_min_radius) > 0;
             } else
                 std::cerr
                         << "WARNING: unknown first argument (expecting either a point cloud file in *.xyz format or a\n"

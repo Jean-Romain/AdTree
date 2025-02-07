@@ -105,6 +105,13 @@ namespace easy3d {
 
         // shadowing
         bool shadowing_enabled_;
+
+	// Parmeter for skeleton
+	protected:
+	    float param_alpha;
+    	float param_subtree_thresold;
+		float param_min_radius;
+		bool param_remove_duplication;
 	};
 
 }

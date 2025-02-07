@@ -51,6 +51,10 @@ Skeleton::Skeleton()
 	TreeHeight_ = 0;
 	BoundingDistance_ = 0;
 	VecLeaves_.clear();
+
+	param_subtree_threshold = 0.019;
+	param_alpha = 1.0;
+	param_min_radius = 0.0f;
 }
 
 
@@ -181,7 +185,7 @@ bool Skeleton::simplify_skeleton()
 {
     if (!quiet_)
         std::cout << "step 1: eliminate unimportant small edges" << std::endl;
-    keep_main_skeleton(&MST_, 0.019);
+    keep_main_skeleton(&MST_);
 
     if (!quiet_)
         std::cout << "step 2: iteratively merge collapsed edges" << std::endl;
@@ -361,7 +365,7 @@ bool Skeleton::add_leaves()
 }
 
 
-void Skeleton::keep_main_skeleton(Graph *i_Graph, double subtree_Threshold)
+void Skeleton::keep_main_skeleton(Graph *i_Graph)
 {
 	//initialize
     simplified_skeleton_.clear();
@@ -391,7 +395,7 @@ void Skeleton::keep_main_skeleton(Graph *i_Graph, double subtree_Threshold)
 			{
 				double child2Current = std::sqrt((*i_Graph)[currentV].cVert.distance2((*i_Graph)[*aIter].cVert));
 				double subtreeRatio = ((*i_Graph)[*aIter].lengthOfSubtree + child2Current) / (*i_Graph)[currentV].lengthOfSubtree;
-				if (subtreeRatio >= subtree_Threshold)
+				if (subtreeRatio >= param_subtree_threshold)
 				{
 					SGraphEdgeProp pEdge;
 					SGraphEdgeDescriptor sEdge = edge(*aIter, currentV, (*i_Graph)).first;
@@ -545,7 +549,7 @@ bool Skeleton::check_single_child_vertex(Graph* i_Graph, SGraphVertexDescriptor 
 
 	//determine the merging threshold and check if current vertex can be merged or not
 	double r = (*i_Graph)[edge(i_dVertex, parentV, *i_Graph).first].nRadius;
-	if (distance >= 1.0 * r) 
+	if (distance >= param_alpha * r) 
 		return false;
 	else
 	{
@@ -1368,6 +1372,8 @@ void Skeleton::add_generalized_cylinder_to_model(SurfaceMesh *mesh, const Branch
             std::cerr << "file: " << __FILE__ << "\t" << "line: " << __LINE__ << "\n"
                       << "\ts: " << s << ";  t: " << t << std::endl;
         double r = radius[np];
+
+		if (r < param_min_radius) break;
 
         //find a vector perpendicular to the direction
         const vec3 offset = t - s;

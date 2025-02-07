@@ -52,6 +52,10 @@ namespace easy3d {
 		: Viewer(title, samples, gl_major, gl_minor, full_screen, resizable, depth_bits, stencil_bits)
         , alpha_(0.8f), shadowing_enabled_(false)
 	{
+        param_alpha = 1.0f;
+        param_subtree_thresold = 0.019f;
+        param_remove_duplication = true;
+        param_min_radius = 0.0f;
 	}
 
 
@@ -226,6 +230,28 @@ namespace easy3d {
 			}
 			ImGui::EndMainMenuBar();
 		}
+
+
+        ImGui::Begin("Parameters");
+
+        ImGui::Text("Skeleton simplification:");
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Main skeleton simplification with Douglas-Peucker");
+        ImGui::SliderFloat("##SkeletonSimplification", &param_alpha, 0.0f, 2.0f);
+
+        ImGui::Text("Skeleton subtree threshold:");
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Eliminate unimportant small edges and keep the main skeleton");
+        ImGui::SliderFloat("##SubtreeThreshold", &param_subtree_thresold, 0.0f, 0.1f);
+
+        ImGui::Text("Trim architecture:");
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Eliminate small branches with radius below");
+        ImGui::SliderFloat("##MinRadius", &param_min_radius, 0.0f, 0.05f);
+
+        ImGui::Checkbox("Remove duplicates", &param_remove_duplication);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("The point cloud may have duplicated points. Remove duplication can improve robustness.");
+
+        if (ImGui::Button("Reconstruction")) reconstruct_skeleton();
+        ImGui::End();
+
         ImGui::PopStyleVar();
 
 		ImGui::Render();
