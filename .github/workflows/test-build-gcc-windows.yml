@@ -33,9 +33,10 @@ jobs:
           cd Release
           cmake -G "MinGW Makefiles" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release ..
           mingw32-make
+          find . -name "*.exe"
 
       - name: Upload Windows Release .exe
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: windows-release-exe
-          path: Release/*.exe
+          path: ./bin/*.exe  # Match .exe files inside bin/
