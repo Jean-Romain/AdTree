@@ -77,9 +77,8 @@ jobs:
         shell: bash -l {0}
         run: cmake --build build/${{ matrix.build_type }} --config ${{ matrix.build_type }}
 
-      - name: Upload binaries
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: AdTree-${{ matrix.platform }}-${{ matrix.build_type }}
-          path: |
-            ./bin/${{ matrix.build_type }}/*.exe
+          name: AdTree-artifacts
+          path: '**'
