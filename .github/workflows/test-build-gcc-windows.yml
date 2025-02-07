@@ -40,7 +40,7 @@ jobs:
           mingw32-make
 
       - name: Upload Windows Release .exe
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-release-exe
           path: Release/*.exe
