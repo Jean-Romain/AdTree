@@ -20,14 +20,9 @@ jobs:
           update: true
           install: >-
             ${{ matrix.compilers }} 
-            mingw-w64-x86_64-make 
-            mingw-w64-x86_64-cmake 
-            mingw-w64-x86_64-glu 
-            mingw-w64-x86_64-mesa 
-            mingw-w64-x86_64-libxrandr 
-            mingw-w64-x86_64-libxinerama 
-            mingw-w64-x86_64-libxcursor 
-            mingw-w64-x86_64-libxi 
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-freeglut  # Alternative to libglu1-mesa-dev
             mingw-w64-x86_64-boost
 
       - name: Build
