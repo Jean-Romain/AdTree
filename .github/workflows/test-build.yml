@@ -80,5 +80,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: AdTree-artifacts
+          name: AdTree-${{ runner.os }}-${{ matrix.build_type }}
           path: '**'
