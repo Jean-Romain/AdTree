@@ -82,4 +82,4 @@ jobs:
         with:
           name: AdTree-${{ matrix.platform }}-${{ matrix.build_type }}
           path: |
-            build/${{ matrix.build_type }}/*
+            ./bin/${{ matrix.build_type }}/*.exe
