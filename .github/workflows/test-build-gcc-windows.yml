@@ -36,7 +36,7 @@ jobs:
           find . -name "*.exe"
 
       - name: Upload Windows Release .exe
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-release-exe
           path: ./bin/*.exe  # Match .exe files inside bin/
